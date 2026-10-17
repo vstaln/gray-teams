@@ -100,9 +100,16 @@ fn sidecar() -> std::io::Result<()> {
                 let reply = if method == "plugin/manifest" {
                     json!({"id": id, "result": manifest()})
                 } else if method == "tool/call" {
-                    let r = match send(&v["params"]["args"]) {
-                        Ok(c) => json!({"id": id, "result": {"content": c}}),
-                        Err(e) => json!({"id": id, "result": {"content": e, "is_error": true}}),
+                    let name = v["params"]["name"].as_str().unwrap_or("");
+                    let r = match name {
+                        "teams_send" => match send(&v["params"]["args"]) {
+                            Ok(c) => json!({"id": id, "result": {"content": c}}),
+                            Err(e) => json!({"id": id,
+                                "result": {"content": e, "is_error": true}}),
+                        },
+                        other => json!({"id": id, "result": {
+                            "content": format!("unknown tool {other}"),
+                            "is_error": true}}),
                     };
                     r
                 } else if method == "command/run" {
