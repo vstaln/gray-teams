@@ -13,7 +13,7 @@ fn manifest() -> Value {
         "name": NAME, "display_name": "Microsoft Teams",
         "version": env!("CARGO_PKG_VERSION"), "protocol": "1.1",
         "tools": [
-            {"name": "teams_send",
+            {"name": "teams_send", "label": "Teams", "preview": "{text|firstline}",
              "description": "Post text (or an Adaptive Card body) to the configured Teams channel webhook.",
              "parameters": {"type": "object", "properties": {
                 "text": {"type": "string"}}, "required": ["text"]}},
