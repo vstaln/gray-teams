@@ -13,12 +13,13 @@ fn manifest() -> Value {
         "name": NAME, "display_name": "Microsoft Teams",
         "version": env!("CARGO_PKG_VERSION"), "protocol": "1.1",
         "tools": [
-            {"name": "teams_send",
+            {"name": "teams_send", "label": "Teams", "preview": "{text|firstline}",
              "description": "Post text (or an Adaptive Card body) to the configured Teams channel webhook.",
              "parameters": {"type": "object", "properties": {
                 "text": {"type": "string"}}, "required": ["text"]}},
         ],
         "commands": ["/teams"], "subcommands": ["teams"],
+        "command_descriptions": {"/teams": "Microsoft Teams bridge"},
     })
 }
 
@@ -128,9 +129,16 @@ fn sidecar() -> std::io::Result<()> {
                 let reply = if method == "plugin/manifest" {
                     json!({"id": id, "result": manifest()})
                 } else if method == "tool/call" {
-                    let r = match send(&v["params"]["args"]) {
-                        Ok(c) => json!({"id": id, "result": {"content": c}}),
-                        Err(e) => json!({"id": id, "result": {"content": e, "is_error": true}}),
+                    let name = v["params"]["name"].as_str().unwrap_or("");
+                    let r = match name {
+                        "teams_send" => match send(&v["params"]["args"]) {
+                            Ok(c) => json!({"id": id, "result": {"content": c}}),
+                            Err(e) => json!({"id": id,
+                                "result": {"content": e, "is_error": true}}),
+                        },
+                        other => json!({"id": id, "result": {
+                            "content": format!("unknown tool {other}"),
+                            "is_error": true}}),
                     };
                     r
                 } else if method == "command/run" {
