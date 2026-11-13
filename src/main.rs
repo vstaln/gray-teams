@@ -19,6 +19,7 @@ fn manifest() -> Value {
                 "text": {"type": "string"}}, "required": ["text"]}},
         ],
         "commands": ["/teams"], "subcommands": ["teams"],
+        "command_descriptions": {"/teams": "Microsoft Teams bridge"},
     })
 }
 
