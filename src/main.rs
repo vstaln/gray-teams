@@ -76,7 +76,7 @@ fn cli(argv: &[String]) -> Result<String, String> {
     match argv.first().map(String::as_str) {
         Some("setup") => {
             let mut it = argv[1..].iter();
-            while let Some(f) = it.next() {
+            if let Some(f) = it.next() {
                 if f == "--webhook" {
                     let w = it.next().ok_or("--webhook needs URL")?;
                     std::fs::create_dir_all(config_path().parent().unwrap())
